@@ -1,22 +1,53 @@
 import { useState } from 'react'
+import PostList from './components/PostList'
+import PostDetail from './components/PostDetail'
+import PostWrite from './components/PostWrite'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [view, setView] = useState('list') // list, detail, write
+  const [selectedPostId, setSelectedPostId] = useState(null)
+  const [postToEdit, setPostToEdit] = useState(null)
+
+  const handleSelectPost = (id) => {
+    setSelectedPostId(id)
+    setView('detail')
+  }
+
+  const handleShowWrite = () => {
+    setPostToEdit(null)
+    setView('write')
+  }
+
+  const handleEdit = (post) => {
+    setPostToEdit(post)
+    setView('write')
+  }
+
+  const handleBack = () => {
+    setView('list')
+    setSelectedPostId(null)
+    setPostToEdit(null)
+  }
+
+  const handleSuccess = () => {
+    setView('list')
+    setSelectedPostId(null)
+    setPostToEdit(null)
+  }
 
   return (
-    <div className="container">
-      <h1>Hello, World! 👋</h1>
-      <p>React + Vite 프론트엔드에 오신 것을 환영합니다.</p>
-
-      <div className="card">
-        <button onClick={() => setCount(count + 1)}>
-          클릭 횟수: {count}
-        </button>
-      </div>
-
-      <div className="info">
-        <p>👉 <code>src/App.jsx</code> 파일을 수정해보세요</p>
+    <div className="app-container">
+      <div className="app-layout">
+        {view === 'list' && (
+          <PostList onSelectPost={handleSelectPost} onShowWrite={handleShowWrite} />
+        )}
+        {view === 'detail' && (
+          <PostDetail postId={selectedPostId} onBack={handleBack} onEdit={handleEdit} />
+        )}
+        {view === 'write' && (
+          <PostWrite postToEdit={postToEdit} onBack={handleBack} onSuccess={handleSuccess} />
+        )}
       </div>
     </div>
   )

@@ -1,77 +1,13 @@
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  text-align: center;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-h1 {
-  color: #333;
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  animation: slideDown 0.6s ease-out;
-}
-
-p {
-  color: #666;
-  font-size: 1.1em;
-  margin-bottom: 30px;
-}
-
-.card {
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
   background: #f5f5f5;
-  padding: 30px;
-  border-radius: 12px;
-  margin: 30px 0;
 }
 
-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 15px 40px;
-  font-size: 1.1em;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  font-weight: bold;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-.info {
-  margin-top: 30px;
-  padding: 20px;
-  background: #fffaf0;
-  border-left: 4px solid #ffa500;
-  border-radius: 4px;
-}
-
-.info code {
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  color: #d4376b;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.app-layout {
+  flex: 1;
+  display: flex;
+  background: white;
+  overflow: hidden;
 }
