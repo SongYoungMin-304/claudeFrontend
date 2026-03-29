@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { postApi } from '../api/postApi'
-import './PostDetail.css'
 
 function PostDetail({ postId, onBack, onEdit }) {
   const [post, setPost] = useState(null)
@@ -24,37 +23,49 @@ function PostDetail({ postId, onBack, onEdit }) {
     }
   }
 
-  if (loading) return <div className="loading">로딩 중...</div>
-  if (error) return <div className="error">오류: {error}</div>
-  if (!post) return <div className="error">게시글을 찾을 수 없습니다</div>
+  if (loading) return (
+    <div className="flex-1 flex items-center justify-center text-lg text-gray-500">로딩 중...</div>
+  )
+  if (error) return (
+    <div className="flex-1 flex items-center justify-center text-lg text-red-500">오류: {error}</div>
+  )
+  if (!post) return (
+    <div className="flex-1 flex items-center justify-center text-lg text-red-500">게시글을 찾을 수 없습니다</div>
+  )
 
   return (
-    <div className="post-detail">
-      <div className="post-detail-header">
-        <button className="btn-back" onClick={onBack}>
+    <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-5 bg-gray-100 border-b-2 border-gray-300">
+        <button
+          onClick={onBack}
+          className="px-4 py-2 bg-gray-300 text-gray-800 font-bold rounded hover:bg-gray-400 transition-colors"
+        >
           ← 목록으로
         </button>
-        <button className="btn-edit" onClick={() => onEdit(post)}>
+        <button
+          onClick={() => onEdit(post)}
+          className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded hover:shadow-md hover:-translate-y-0.5 transition-all"
+        >
           수정
         </button>
       </div>
 
-      <div className="post-detail-content">
-        <h1>{post.title}</h1>
-        <div className="post-meta">
-          <span className="author">작성자: {post.author}</span>
-          <span className="date">
+      <div className="flex-1 px-10 py-10 max-w-4xl mx-auto w-full">
+        <h1 className="mb-5 text-4xl text-gray-800 break-words">{post.title}</h1>
+        <div className="flex flex-wrap gap-5 pb-5 border-b border-gray-300 mb-8">
+          <span className="text-gray-700 text-sm">작성자: {post.author}</span>
+          <span className="text-gray-700 text-sm">
             {new Date(post.createdAt).toLocaleString('ko-KR')}
           </span>
           {post.updatedAt !== post.createdAt && (
-            <span className="updated">
+            <span className="text-gray-500 text-sm italic">
               수정: {new Date(post.updatedAt).toLocaleString('ko-KR')}
             </span>
           )}
         </div>
-        <div className="post-body">
+        <div className="text-gray-800 leading-relaxed text-base">
           {post.content.split('\n').map((line, idx) => (
-            <p key={idx}>{line}</p>
+            <p key={idx} className="my-4 break-words whitespace-pre-wrap">{line}</p>
           ))}
         </div>
       </div>

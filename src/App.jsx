@@ -37,8 +37,8 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <div className="app-layout">
+    <div className="w-screen h-screen flex bg-gray-100">
+      <div className="flex-1 bg-white overflow-hidden">
         {view === 'list' && (
           <PostList onSelectPost={handleSelectPost} onShowWrite={handleShowWrite} />
         )}
