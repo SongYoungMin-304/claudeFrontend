@@ -1,53 +1,47 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from './context/AuthContext'
+import Login from './components/Login'
+import Signup from './components/Signup'
 import PostList from './components/PostList'
 import PostDetail from './components/PostDetail'
 import PostWrite from './components/PostWrite'
 import './App.css'
 
 function App() {
-  const [view, setView] = useState('list') // list, detail, write
+  const { isAuthenticated, logout } = useAuth()
+  const [view, setView] = useState('list')
   const [selectedPostId, setSelectedPostId] = useState(null)
   const [postToEdit, setPostToEdit] = useState(null)
+  const [page, setPage] = useState('home')
 
-  const handleSelectPost = (id) => {
-    setSelectedPostId(id)
-    setView('detail')
-  }
+  useEffect(() => {
+    const path = window.location.pathname
+    if (path === '/login') setPage('login')
+    else if (path === '/signup') setPage('signup')
+    else setPage('home')
+  }, [])
 
-  const handleShowWrite = () => {
-    setPostToEdit(null)
-    setView('write')
-  }
+  if (!isAuthenticated && page === 'login') return <Login />
+  if (!isAuthenticated && page === 'signup') return <Signup />
 
-  const handleEdit = (post) => {
-    setPostToEdit(post)
-    setView('write')
-  }
-
-  const handleBack = () => {
-    setView('list')
-    setSelectedPostId(null)
-    setPostToEdit(null)
-  }
-
-  const handleSuccess = () => {
-    setView('list')
-    setSelectedPostId(null)
-    setPostToEdit(null)
-  }
+  const handleSelectPost = (id) => { setSelectedPostId(id); setView('detail') }
+  const handleShowWrite = () => { setPostToEdit(null); setView('write') }
+  const handleEdit = (post) => { setPostToEdit(post); setView('write') }
+  const handleBack = () => { setView('list'); setSelectedPostId(null); setPostToEdit(null) }
+  const handleSuccess = () => { setView('list'); setSelectedPostId(null); setPostToEdit(null) }
 
   return (
-    <div className="w-screen h-screen flex bg-gray-100">
-      <div className="flex-1 bg-white overflow-hidden">
-        {view === 'list' && (
-          <PostList onSelectPost={handleSelectPost} onShowWrite={handleShowWrite} />
-        )}
-        {view === 'detail' && (
-          <PostDetail postId={selectedPostId} onBack={handleBack} onEdit={handleEdit} />
-        )}
-        {view === 'write' && (
-          <PostWrite postToEdit={postToEdit} onBack={handleBack} onSuccess={handleSuccess} />
-        )}
+    <div className="w-screen h-screen flex flex-col bg-gray-100">
+      <header className="bg-white shadow p-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold text-gray-800">My Blog</h1>
+        <button onClick={logout} className="text-sm text-red-500 hover:text-red-700">
+          로그아웃
+        </button>
+      </header>
+      <div className="flex-1 overflow-hidden">
+        {view === 'list' && <PostList onSelectPost={handleSelectPost} onShowWrite={handleShowWrite} />}
+        {view === 'detail' && <PostDetail postId={selectedPostId} onBack={handleBack} onEdit={handleEdit} />}
+        {view === 'write' && <PostWrite postToEdit={postToEdit} onBack={handleBack} onSuccess={handleSuccess} />}
       </div>
     </div>
   )
