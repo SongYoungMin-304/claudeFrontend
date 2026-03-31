@@ -21,9 +21,16 @@ export function AuthProvider({ children }) {
   }
 
   const signup = async (name, email, password) => authApi.signup(name, email, password)
-  const logout = () => { authApi.logout(); setUser(null) }
+  
+  const logout = () => {
+    authApi.logout()
+    setUser(null)
+    window.location.href = '/login'
+  }
 
-  const value = { user, loading, isAuthenticated: !!user, login, signup, logout }
+  const isAuthenticated = () => !!localStorage.getItem('accessToken')
+
+  const value = { user, loading, isAuthenticated, login, signup, logout }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuth } from './context/AuthContext'
 import Login from './components/Login'
 import Signup from './components/Signup'
@@ -8,21 +8,20 @@ import PostWrite from './components/PostWrite'
 import './App.css'
 
 function App() {
-  const { isAuthenticated, logout } = useAuth()
+  const { logout } = useAuth()
   const [view, setView] = useState('list')
   const [selectedPostId, setSelectedPostId] = useState(null)
   const [postToEdit, setPostToEdit] = useState(null)
-  const [page, setPage] = useState('home')
 
-  useEffect(() => {
-    const path = window.location.pathname
-    if (path === '/login') setPage('login')
-    else if (path === '/signup') setPage('signup')
-    else setPage('home')
-  }, [])
+  const isLoggedIn = !!localStorage.getItem('accessToken')
+  const path = window.location.pathname
 
-  if (!isAuthenticated && page === 'login') return <Login />
-  if (!isAuthenticated && page === 'signup') return <Signup />
+  if (path === '/login') return <Login />
+  if (path === '/signup') return <Signup />
+  if (!isLoggedIn) {
+    window.location.href = '/login'
+    return null
+  }
 
   const handleSelectPost = (id) => { setSelectedPostId(id); setView('detail') }
   const handleShowWrite = () => { setPostToEdit(null); setView('write') }
