@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { postApi } from '../api/postApi'
+import CommentList from './Comment/CommentList'
 
 function PostDetail({ postId, onBack, onEdit }) {
   const [post, setPost] = useState(null)
@@ -68,6 +69,8 @@ function PostDetail({ postId, onBack, onEdit }) {
             <p key={idx} className="my-4 break-words whitespace-pre-wrap">{line}</p>
           ))}
         </div>
+
+        <CommentList postId={postId} />
       </div>
     </div>
   )
