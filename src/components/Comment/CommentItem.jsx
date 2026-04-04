@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import CommentForm from './CommentForm'
+import { commentApi } from '../../api/commentApi'
 
-export default function CommentItem({ comment, onUpdate, onDelete, onReply, depth = 0 }) {
+export default function CommentItem({ comment, postId, onUpdate, onDelete, onReply, depth = 0 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showReplyForm, setShowReplyForm] = useState(false)
+  const [likeStatus, setLikeStatus] = useState({ likeCount: comment.likeCount || 0, isLiked: comment.isLiked || false })
+  const [likeLoading, setLikeLoading] = useState(false)
 
   const currentUserId = parseInt(localStorage.getItem('userId'))
   const isAuthor = currentUserId === comment.authorId
@@ -39,6 +42,18 @@ export default function CommentItem({ comment, onUpdate, onDelete, onReply, dept
       hour: '2-digit',
       minute: '2-digit'
     })
+  }
+
+  const handleLike = async () => {
+    try {
+      setLikeLoading(true)
+      const result = await commentApi.likeComment(postId, comment.id)
+      setLikeStatus({ likeCount: result.likeCount, isLiked: result.isLiked })
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setLikeLoading(false)
+    }
   }
 
   const isReply = comment.parentId !== null
@@ -98,6 +113,28 @@ export default function CommentItem({ comment, onUpdate, onDelete, onReply, dept
             <p className="mt-2 text-gray-700 whitespace-pre-wrap">
               {comment.content}
             </p>
+            <div className="flex items-center gap-3 mt-3 pt-2 border-t border-gray-100">
+              <button
+                onClick={handleLike}
+                disabled={likeLoading}
+                className={`flex items-center gap-1 text-sm transition-colors ${
+                  likeStatus.isLiked
+                    ? 'text-red-500 hover:text-red-600'
+                    : 'text-gray-400 hover:text-red-500'
+                } disabled:opacity-50`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  fill={likeStatus.isLiked ? 'currentColor' : 'none'}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span>{likeStatus.likeCount}</span>
+              </button>
+            </div>
           </>
         )}
       </div>
@@ -114,20 +151,21 @@ export default function CommentItem({ comment, onUpdate, onDelete, onReply, dept
         </div>
       )}
 
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="space-y-2">
-          {comment.replies.map((reply) => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              onUpdate={onUpdate}
-              onDelete={onDelete}
-              onReply={onReply}
-              depth={depth + 1}
-            />
-          ))}
-        </div>
-      )}
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="space-y-2">
+              {comment.replies.map((reply) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  postId={postId}
+                  onUpdate={onUpdate}
+                  onDelete={onDelete}
+                  onReply={onReply}
+                  depth={depth + 1}
+                />
+              ))}
+            </div>
+          )}
     </div>
   )
 }

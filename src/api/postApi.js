@@ -57,5 +57,25 @@ export const postApi = {
     })
     if (!response.ok) throw new Error('게시글 삭제 실패')
     return true
+  },
+
+  likePost: async (postId) => {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
+      method: 'POST',
+      headers: { ...getAuthHeaders() }
+    })
+    if (!response.ok) {
+      if (response.status === 401) throw new Error('로그인이 필요합니다')
+      throw new Error('좋아요 처리 실패')
+    }
+    return response.json()
+  },
+
+  getPostLikeStatus: async (postId) => {
+    const response = await fetch(`${API_BASE_URL}/posts/${postId}/like`, {
+      headers: { ...getAuthHeaders() }
+    })
+    if (!response.ok) throw new Error('좋아요 상태 조회 실패')
+    return response.json()
   }
 }

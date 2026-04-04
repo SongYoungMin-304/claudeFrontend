@@ -7,10 +7,13 @@ function PostDetail({ postId, onBack, onEdit, onNavigate }) {
   const [navigation, setNavigation] = useState({ prev: null, next: null })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [likeStatus, setLikeStatus] = useState({ likeCount: 0, isLiked: false })
+  const [likeLoading, setLikeLoading] = useState(false)
 
   useEffect(() => {
     fetchPost()
     fetchNavigation()
+    fetchLikeStatus()
   }, [postId])
 
   const fetchPost = async () => {
@@ -32,6 +35,27 @@ function PostDetail({ postId, onBack, onEdit, onNavigate }) {
       setNavigation(nav)
     } catch (err) {
       console.error('네비게이션 조회 실패', err)
+    }
+  }
+
+  const fetchLikeStatus = async () => {
+    try {
+      const status = await postApi.getPostLikeStatus(postId)
+      setLikeStatus({ likeCount: status.likeCount, isLiked: status.isLiked })
+    } catch (err) {
+      console.error('좋아요 상태 조회 실패', err)
+    }
+  }
+
+  const handleLike = async () => {
+    try {
+      setLikeLoading(true)
+      const result = await postApi.likePost(postId)
+      setLikeStatus({ likeCount: result.likeCount, isLiked: result.isLiked })
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setLikeLoading(false)
     }
   }
 
@@ -79,6 +103,29 @@ function PostDetail({ postId, onBack, onEdit, onNavigate }) {
           {post.content.split('\n').map((line, idx) => (
             <p key={idx} className="my-4 break-words whitespace-pre-wrap">{line}</p>
           ))}
+        </div>
+
+        <div className="flex items-center gap-3 mt-6 py-4 border-t border-gray-200">
+          <button
+            onClick={handleLike}
+            disabled={likeLoading}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
+              likeStatus.isLiked
+                ? 'bg-red-100 text-red-500 hover:bg-red-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-500'
+            } disabled:opacity-50`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-5 w-5 ${likeStatus.isLiked ? 'fill-current' : 'hover:fill-current'}`}
+              fill={likeStatus.isLiked ? 'currentColor' : 'none'}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span className="font-medium">{likeStatus.likeCount}</span>
+          </button>
         </div>
 
         <div className="border-t border-gray-200 py-4 my-8">

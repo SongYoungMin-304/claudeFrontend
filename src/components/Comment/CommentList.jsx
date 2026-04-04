@@ -103,6 +103,7 @@ export default function CommentList({ postId }) {
             <CommentItem
               key={comment.id}
               comment={comment}
+              postId={postId}
               onUpdate={handleUpdateComment}
               onDelete={handleDeleteComment}
               onReply={handleReply}

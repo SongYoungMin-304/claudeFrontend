@@ -71,7 +71,7 @@ function PostList({ onSelectPost, onShowWrite }) {
                   삭제
                 </button>
               </div>
-              <p className="my-1.25 text-gray-600 text-sm">작성자: {post.author}</p>
+              <p className="my-1.25 text-gray-600 text-sm">작성자: {post.author} • ♥ {post.likeCount || 0}</p>
               <p className="my-2.5 text-gray-700 leading-6">{post.content.substring(0, 100)}...</p>
               <p className="mt-2.5 text-gray-400 text-xs">
                 {new Date(post.createdAt).toLocaleString('ko-KR')}
