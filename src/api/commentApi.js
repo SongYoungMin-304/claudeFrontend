@@ -22,17 +22,21 @@ export const commentApi = {
     return response.json()
   },
 
-  createComment: async (postId, content) => {
+  createComment: async (postId, content, parentId = null) => {
     const response = await fetch(`${API_BASE_URL}/posts/${postId}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-      body: JSON.stringify({ content })
+      body: JSON.stringify({ content, parentId })
     })
     if (!response.ok) {
       if (response.status === 401) throw new Error('로그인이 필요합니다')
       throw new Error('댓글 작성 실패')
     }
     return response.json()
+  },
+
+  createReply: async (postId, parentId, content) => {
+    return commentApi.createComment(postId, content, parentId)
   },
 
   updateComment: async (postId, commentId, content) => {

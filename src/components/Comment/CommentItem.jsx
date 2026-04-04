@@ -1,16 +1,26 @@
 import { useState } from 'react'
 import CommentForm from './CommentForm'
 
-export default function CommentItem({ comment, onUpdate, onDelete }) {
+export default function CommentItem({ comment, onUpdate, onDelete, onReply, depth = 0 }) {
   const [isEditing, setIsEditing] = useState(false)
+  const [showReplyForm, setShowReplyForm] = useState(false)
 
   const currentUserId = parseInt(localStorage.getItem('userId'))
   const isAuthor = currentUserId === comment.authorId
+  const canReply = depth < 1
 
   const handleUpdate = async (content) => {
     const result = await onUpdate(comment.id, content)
     if (result.success) {
       setIsEditing(false)
+    }
+    return result
+  }
+
+  const handleReply = async (content) => {
+    const result = await onReply(comment.id, content)
+    if (result.success) {
+      setShowReplyForm(false)
     }
     return result
   }
@@ -31,51 +41,92 @@ export default function CommentItem({ comment, onUpdate, onDelete }) {
     })
   }
 
+  const isReply = comment.parentId !== null
+
   return (
-    <div className="border rounded-lg p-4 bg-white">
-      {isEditing ? (
-        <CommentForm
-          initialContent={comment.content}
-          onSubmit={handleUpdate}
-          onCancel={() => setIsEditing(false)}
-          buttonText="수정 완료"
-          cancelText="취소"
-        />
-      ) : (
-        <>
-          <div className="flex justify-between items-start">
-            <div>
-              <span className="font-semibold">{comment.authorName}</span>
-              <span className="text-gray-400 text-sm ml-2">
-                {formatDate(comment.createdAt)}
-              </span>
-              {comment.updatedAt && (
+    <div className={`${isReply ? 'ml-8 pl-4 border-l-2 border-blue-300' : ''}`}>
+      <div className="border rounded-lg p-4 bg-white mb-2">
+        {isEditing ? (
+          <CommentForm
+            initialContent={comment.content}
+            onSubmit={handleUpdate}
+            onCancel={() => setIsEditing(false)}
+            buttonText="수정 완료"
+            cancelText="취소"
+          />
+        ) : (
+          <>
+            <div className="flex justify-between items-start">
+              <div>
+                <span className="font-semibold">{comment.authorName}</span>
                 <span className="text-gray-400 text-sm ml-2">
-                  (수정됨)
+                  {formatDate(comment.createdAt)}
                 </span>
-              )}
-            </div>
-            {isAuthor && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="text-sm text-blue-500 hover:text-blue-700"
-                >
-                  수정
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="text-sm text-red-500 hover:text-red-700"
-                >
-                  삭제
-                </button>
+                {comment.updatedAt && (
+                  <span className="text-gray-400 text-sm ml-2">
+                    (수정됨)
+                  </span>
+                )}
               </div>
-            )}
-          </div>
-          <p className="mt-2 text-gray-700 whitespace-pre-wrap">
-            {comment.content}
-          </p>
-        </>
+              <div className="flex gap-2">
+                {canReply && onReply && (
+                  <button
+                    onClick={() => setShowReplyForm(!showReplyForm)}
+                    className="text-sm text-blue-500 hover:text-blue-700"
+                  >
+                    답글
+                  </button>
+                )}
+                {isAuthor && (
+                  <>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="text-sm text-blue-500 hover:text-blue-700"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="text-sm text-red-500 hover:text-red-700"
+                    >
+                      삭제
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            <p className="mt-2 text-gray-700 whitespace-pre-wrap">
+              {comment.content}
+            </p>
+          </>
+        )}
+      </div>
+
+      {showReplyForm && (
+        <div className="ml-8 mb-2">
+          <CommentForm
+            onSubmit={handleReply}
+            onCancel={() => setShowReplyForm(false)}
+            buttonText="답글 작성"
+            cancelText="취소"
+            placeholder="답글을 입력하세요..."
+          />
+        </div>
+      )}
+
+      {comment.replies && comment.replies.length > 0 && (
+        <div className="space-y-2">
+          {comment.replies.map((reply) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              onReply={onReply}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
       )}
     </div>
   )

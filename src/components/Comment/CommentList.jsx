@@ -35,6 +35,16 @@ export default function CommentList({ postId }) {
     }
   }
 
+  const handleReply = async (parentCommentId, content) => {
+    try {
+      await commentApi.createReply(postId, parentCommentId, content)
+      await fetchComments()
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err.message }
+    }
+  }
+
   const handleUpdateComment = async (commentId, content) => {
     try {
       await commentApi.updateComment(postId, commentId, content)
@@ -95,6 +105,8 @@ export default function CommentList({ postId }) {
               comment={comment}
               onUpdate={handleUpdateComment}
               onDelete={handleDeleteComment}
+              onReply={handleReply}
+              depth={0}
             />
           ))
         )}
