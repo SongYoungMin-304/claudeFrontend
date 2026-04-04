@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import { postApi } from '../api/postApi'
 import CommentList from './Comment/CommentList'
 
-function PostDetail({ postId, onBack, onEdit }) {
+function PostDetail({ postId, onBack, onEdit, onNavigate }) {
   const [post, setPost] = useState(null)
+  const [navigation, setNavigation] = useState({ prev: null, next: null })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     fetchPost()
+    fetchNavigation()
   }, [postId])
 
   const fetchPost = async () => {
@@ -21,6 +23,15 @@ function PostDetail({ postId, onBack, onEdit }) {
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchNavigation = async () => {
+    try {
+      const nav = await postApi.getPostNavigation(postId)
+      setNavigation(nav)
+    } catch (err) {
+      console.error('네비게이션 조회 실패', err)
     }
   }
 
@@ -68,6 +79,38 @@ function PostDetail({ postId, onBack, onEdit }) {
           {post.content.split('\n').map((line, idx) => (
             <p key={idx} className="my-4 break-words whitespace-pre-wrap">{line}</p>
           ))}
+        </div>
+
+        <div className="border-t border-gray-200 py-4 my-8">
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex-1">
+              {navigation.prev ? (
+                <button 
+                  onClick={() => onNavigate(navigation.prev.id)}
+                  className="text-left w-full hover:text-blue-600 transition-colors"
+                >
+                  <span className="text-gray-500 text-sm">← 이전글</span>
+                  <p className="text-blue-600 truncate">{navigation.prev.title}</p>
+                </button>
+              ) : (
+                <p className="text-gray-400 text-sm">이전글이 없습니다</p>
+              )}
+            </div>
+            
+            <div className="flex-1 text-right">
+              {navigation.next ? (
+                <button 
+                  onClick={() => onNavigate(navigation.next.id)}
+                  className="text-right w-full hover:text-blue-600 transition-colors"
+                >
+                  <span className="text-gray-500 text-sm">다음글 →</span>
+                  <p className="text-blue-600 truncate">{navigation.next.title}</p>
+                </button>
+              ) : (
+                <p className="text-gray-400 text-sm">다음글이 없습니다</p>
+              )}
+            </div>
+          </div>
         </div>
 
         <CommentList postId={postId} />

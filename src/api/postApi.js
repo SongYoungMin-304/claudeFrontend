@@ -22,6 +22,14 @@ export const postApi = {
     return response.json()
   },
 
+  getPostNavigation: async (id) => {
+    const response = await fetch(`${API_BASE_URL}/posts/${id}/navigation`, {
+      headers: { ...getAuthHeaders() }
+    })
+    if (!response.ok) throw new Error('네비게이션 조회 실패')
+    return response.json()
+  },
+
   createPost: async (title, content, author) => {
     const response = await fetch(`${API_BASE_URL}/posts`, {
       method: 'POST',

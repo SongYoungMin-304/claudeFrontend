@@ -28,6 +28,7 @@ function App() {
   const handleEdit = (post) => { setPostToEdit(post); setView('write') }
   const handleBack = () => { setView('list'); setSelectedPostId(null); setPostToEdit(null) }
   const handleSuccess = () => { setView('list'); setSelectedPostId(null); setPostToEdit(null) }
+  const handleNavigate = (postId) => { setSelectedPostId(postId) }
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-100">
@@ -39,7 +40,7 @@ function App() {
       </header>
       <div className="flex-1 overflow-hidden">
         {view === 'list' && <PostList onSelectPost={handleSelectPost} onShowWrite={handleShowWrite} />}
-        {view === 'detail' && <PostDetail postId={selectedPostId} onBack={handleBack} onEdit={handleEdit} />}
+        {view === 'detail' && <PostDetail postId={selectedPostId} onBack={handleBack} onEdit={handleEdit} onNavigate={handleNavigate} />}
         {view === 'write' && <PostWrite postToEdit={postToEdit} onBack={handleBack} onSuccess={handleSuccess} />}
       </div>
     </div>
